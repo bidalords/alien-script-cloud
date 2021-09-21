@@ -1,0 +1,2 @@
+language = "bash"
+run = "git fetch --all; git reset --hard; git reset --hard origin/main; git stash save ''; git pull; sleep 3; pip install cloudscraper pyotp && npm install && npm start"
