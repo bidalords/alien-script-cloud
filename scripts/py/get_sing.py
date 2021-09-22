@@ -1,11 +1,139 @@
-# Python code obfuscated by www.development-tools.net 
- 
+import sys
+import json
+import random
+import subprocess
+import cloudscraper
 
-import base64, codecs
-magic = 'aW1wb3J0IHN5cwppbXBvcnQganNvbgppbXBvcnQgcmFuZG9tCmltcG9ydCBzdWJwcm9jZXNzCmltcG9ydCBjbG91ZHNjcmFwZXIKCnVzZXJBZ2VudHMgPSBbCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMjUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMzUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzc0LjAuMzcyOS4xNjkgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg1LjAuNDE4My44MyBTYWZhcmkvNTM3LjM2IiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0OyBydjo3OS4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzc5LjAiLAogICAgIk1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NC4wLjQxNDcuMTA1IFNhZmFyaS81MzcuMzYiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzYpIEFwcGxlV2ViS2l0LzYwNS4xLjE1IChLSFRNTCwgbGlrZSBHZWNrbykgVmVyc2lvbi8xMy4xLjIgU2FmYXJpLzYwNS4xLjE1IiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0OyBydjo4MC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94LzgwLjAiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzYpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NC4wLjQxNDcuMTM1IFNhZmFyaS81MzcuMzYiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwLjE1OyBydjo3OS4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzc5LjAiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzYpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NS4wLjQxODMuODMgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNikgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMjUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFgxMTsgVWJ1bnR1OyBMaW51eCB4ODZfNjQ7IHJ2Ojc5LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvNzkuMCIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNSkgQXBwbGVXZWJLaXQvNjA1LjEuMTUgKEtIVE1MLCBsaWtlIEdlY2tvKSBWZXJzaW9uLzEzLjEuMSBTYWZhcmkvNjA1LjEuMTUiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzYpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NC4wLjQxNDcuMTA1IFNhZmFyaS81MzcuMzYiLAogICAgIk1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDYuMTsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMzUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgcnY6NzguMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC83OC4wIiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODMuMC40MTAzLjExNiBTYWZhcmkvNTM3LjM2IiwKICAgICJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV80KSBBcHBsZVdlYktpdC82MDUuMS4xNSAoS0hUTUwsIGxpa2UgR2Vja28pIFZlcnNpb24vMTMuMS4yIFNhZmFyaS82MDUuMS4xNSIsCiAgICAiTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODQuMC40MTQ3LjEwNSBTYWZhcmkvNTM3LjM2IiwKICAgICJNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQ7IHJ2Ojc5LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvNzkuMCIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTRfNikgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMDUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNSkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMjUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFgxMTsgVWJ1bnR1OyBMaW51eCB4ODZfNjQ7IHJ2OjgwLjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvODAuMCIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgT'
-love = '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'
-god = 'hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NC4wLjQxNDcuMTM1IFNhZmFyaS81MzcuMzYiLAogICAgIk1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NS4wLjQxODMuODMgU2FmYXJpLzUzNy4zNiBFZGcvODUuMC41NjQuNDEiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDExXzApIEFwcGxlV2ViS2l0LzYwNS4xLjE1IChLSFRNTCwgbGlrZSBHZWNrbykgVmVyc2lvbi8xNC4wIFNhZmFyaS82MDUuMS4xNSIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzcwLjAuMzUzOC4xMDIgU2FmYXJpLzUzNy4zNiBFZGdlLzE4LjE4MzYyIiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvNzAuMC4zNTM4LjEwMiBTYWZhcmkvNTM3LjM2IEVkZ2UvMTguMTgzNjMiLAogICAgIk1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDYuMTsgV2luNjQ7IHg2NDsgcnY6NzkuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC83OS4wIiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjE7IFdpbjY0OyB4NjQ7IHJ2OjgwLjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvODAuMCIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMzUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgNi4zOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODQuMC40MTQ3LjEyNSBTYWZhcmkvNTM3LjM2IiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjM7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NS4wLjQxODMuODMgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzgzLjAuNDEwMy4xMTYgU2FmYXJpLzUzNy4zNiBPUFIvNjkuMC4zNjg2Ljk1IiwKICAgICJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xM182KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODQuMC40MTQ3LjEyNSBTYWZhcmkvNTM3LjM2IiwKICAgICJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNF82KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODUuMC40MTgzLjgzIFNhZmFyaS81MzcuMzYiLAogICAgIk1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDYuMzsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMzUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTNfNikgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMDUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzgzLjAuNDEwMy45NyBTYWZhcmkvNTM3LjM2IiwKICAgICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODQuMC40MTQ3LjEyNSBTYWZhcmkvNTM3LjM2IEVkZy84NC4wLjUyMi42MSIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NDsgcnY6NzcuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC83Ny4wIiwKICAgICJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV81KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvODQuMC40MTQ3Ljg5IFNhZmFyaS81MzcuMzYiLAogICAgIk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzUpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84NS4wLjQxODMuODMgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgNi4zOyBXaW42NDsgeDY0OyBydjo3OS4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzc5LjAiLAogICAgIk1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzgzLjAuNDEwMy4xMTYgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTAuMTQ7IHJ2OjgwLjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvODAuMCIsCiAgICAiTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTNfNikgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg0LjAuNDE0Ny4xMzUgU2FmYXJpLzUzNy4zNiIsCiAgICAiTW96aWxsYS81LjAgKFdpbmRvd3M'
-destiny = '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'
-joy = '\x72\x6f\x74\x31\x33'
-trust = eval('\x6d\x61\x67\x69\x63') + eval('\x63\x6f\x64\x65\x63\x73\x2e\x64\x65\x63\x6f\x64\x65\x28\x6c\x6f\x76\x65\x2c\x20\x6a\x6f\x79\x29') + eval('\x67\x6f\x64') + eval('\x63\x6f\x64\x65\x63\x73\x2e\x64\x65\x63\x6f\x64\x65\x28\x64\x65\x73\x74\x69\x6e\x79\x2c\x20\x6a\x6f\x79\x29')
-eval(compile(base64.b64decode(eval('\x74\x72\x75\x73\x74')),'<string>','exec'))
+userAgents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:80.0) Gecko/20100101 Firefox/80.0",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36 Edg/84.0.522.52",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36 Edg/84.0.522.63",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36 Edg/85.0.564.44",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36 OPR/70.0.3728.106",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36 Edg/84.0.522.59",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36 Edg/85.0.564.41",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36 OPR/69.0.3686.95",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36 Edg/84.0.522.61",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:80.0) Gecko/20100101 Firefox/80.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0",
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36 Edg/84.0.522.58",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.86 YaBrowser/20.8.0.894 Yowser/2.5 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+]
+
+
+try:
+    response = ""
+    scraper = cloudscraper.create_scraper(
+        delay=10,
+        browser={
+            'custom': userAgents[random.randint(0, len(userAgents))]
+        }
+    )
+
+    serialized = list(map(int, sys.argv[1].split(",")))
+
+    res = scraper.post("https://public-wax-on.wax.io/wam/sign", json={
+        "serializedTransaction": serialized,
+        "website": "play.alienworlds.io",
+        "description": "jwt is insecure",
+        "freeBandwidth": False
+    }, headers={
+        # "authority":"public-wax-on.wax.io",
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json;charset=UTF-8",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "sec-gpc": "1",
+        "origin":"https://all-access.wax.io",
+        "referer": "https://all-access.wax.io/",
+        "x-access-token": sys.argv[2]
+    })
+
+    if res.status_code == 403:
+        data = {"code": res.status_code, "data": {
+            "error": "CloudflareError",
+            "message": "Cloudflare Block CODE : 1020"
+        }}  # Your data in JSON-serializable type
+        response = response = json.dumps(data)
+
+    else:
+        data = {"code": res.status_code, "data": res.json()}
+        response = response = json.dumps(data)
+
+
+except Exception as e:
+    subprocess.run(["busybox", "reboot"])
+finally:
+    json.dump(data, sys.stdout)
